@@ -1,0 +1,96 @@
+{% extends 'usuarios/base.html' %}
+
+{% block title %}Listagem de Usuários{% endblock %}
+
+{% block content %}
+    <h1>Lista de Usuários</h1>
+    <table id="tabela-dados" class="table">
+        <thead>
+        <tr>
+            <th scope="col">#Id</th>
+            <th scope="col">Nome</th>
+            <th scope="col">Idade</th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for usuario in usuarios %}
+            <tr>
+                <th scope="row">{{ usuario.id_usuario }}</th>
+                <td>{{ usuario.nome }}</td>
+                <td>{{ usuario.idade }}</td>
+                <td>
+                    <a href="{% url 'editar_usuarios' usuario.id_usuario %}" class="btn btn-warning btn-sm">Editar</a>
+                    <a href="{% url 'excluir_usuarios' usuario.id_usuario %}" class="btn btn-danger btn-sm"
+                       onclick="return confirm('Tem certeza que deseja excluir este usuário?');">Excluir</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    
+
+    <button id="exportar" class="btn btn-primary">Exportar para Excel</button>
+    <button id="exportar-pdf" class="btn btn-secondary">Exportar para PDF</button>
+
+    <!-- Inclusão da biblioteca SheetJS via CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>
+
+    <!-- Inclusão do jsPDF e jsPDF-AutoTable via CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.22/jspdf.plugin.autotable.js"></script>
+
+    <script>
+
+        // Exportar para Excel
+        document.getElementById('exportar').addEventListener('click', function () {
+            // Pegando a tabela HTML
+            var tabela = document.getElementById('tabela-dados');
+
+            // Convertendo a tabela HTML para uma planilha do Excel
+            var wb = XLSX.utils.table_to_book(tabela, {sheet: "Sheet 1"});
+
+            // Gerando o arquivo Excel e forçando o download
+            XLSX.writeFile(wb, 'usuarios.xlsx');
+        });
+
+        // Exportar para PDF
+        document.getElementById('exportar-pdf').addEventListener('click', function () {
+            const {jsPDF} = window.jspdf;
+            const doc = new jsPDF();
+
+            // Obter dados da tabela
+            var tabela = document.getElementById('tabela-dados');
+            var cabecalho = [];
+            var linhas = [];
+
+            // Obter o cabeçalho da tabela
+            var ths = tabela.querySelectorAll('thead th');
+            ths.forEach(function (th) {
+                cabecalho.push(th.textContent.trim());
+            });
+
+            // Obter as linhas de dados
+            var trs = tabela.querySelectorAll('tbody tr');
+            trs.forEach(function (tr) {
+                var linha = [];
+                tr.querySelectorAll('th, td').forEach(function (celula) { // Selecionar todas as células da linha
+                    linha.push(celula.textContent.trim());
+                });
+                linhas.push(linha); // Adicionar a linha ao array
+            });
+
+            // Gerar o PDF com a tabela
+            doc.autoTable({
+                head: [cabecalho],
+                body: linhas,
+                theme: 'striped',
+                margin: {top: 20},
+            });
+
+            // Salvar o PDF
+            doc.save('usuarios.pdf');
+        });
+
+    </script>
+{% endblock %}

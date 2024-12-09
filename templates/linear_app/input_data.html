@@ -1,0 +1,53 @@
+{% extends 'usuarios/base.html' %}
+
+{% block title %}Input de Dados{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <h1 class="text-center mb-4">Input de Dados</h1>
+            <form method="POST" class="bg-light p-4 rounded shadow-sm">
+                {% csrf_token %}
+
+                <h3 class="mb-3">Função Objetivo</h3>
+                <div class="row">
+                    {% for i in num_variables %}
+                        <div class="col-md-4">
+                            <label for="coef_{{ i }}" class="form-label">Coeficiente x{{ i }}:</label>
+                            <input type="number" name="coef_{{ i }}" class="form-control" required>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <hr class="my-4">
+
+                <h3 class="mb-3">Restrições</h3>
+                {% for j in num_constraints %}
+                    <div class="mb-4">
+                        <h4>Restrição {{ j }}</h4>
+                        <div class="row">
+                            {% for i in num_variables %}
+                                <div class="col-md-4">
+                                    <label for="constraint_{{ j }}_coef_{{ i }}" class="form-label">Coeficiente x{{ i }}:</label>
+                                    <input type="number" name="constraint_{{ j }}_coef_{{ i }}" class="form-control"
+                                           required>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="mt-3">
+                            <label for="constraint_{{ j }}_limit" class="form-label">Limite:</label>
+                            <input type="number" name="constraint_{{ j }}_limit" class="form-control" required>
+                        </div>
+                    </div>
+                {% endfor %}
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="/linear" class="btn btn-secondary">Voltar</a>
+                    <button type="submit" class="btn btn-primary">Resultado</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

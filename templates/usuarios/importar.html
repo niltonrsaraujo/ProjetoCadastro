@@ -1,0 +1,18 @@
+{% extends 'usuarios/base.html' %}
+
+{% block title %}Importar Usuários{% endblock %}
+
+{% block content %}
+    <h1>Importar Usuários do Excel</h1>
+    
+    <form method="post" enctype="multipart/form-data" action="{% url 'importar_usuarios' %}">
+        {% csrf_token %}
+        <label for="arquivo">Escolha um arquivo Excel:</label>
+        <input type="file" id="arquivo" name="arquivo" accept=".xlsx, .xls">
+        <button type="submit" class="btn btn-primary">Importar</button>
+    </form>
+    
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+{% endblock %}

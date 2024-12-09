@@ -1,0 +1,71 @@
+{% extends 'usuarios/base.html' %}
+
+{% block title %}Resultados{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <h1 class="text-center mb-4">Resultados</h1>
+            <div class="bg-light p-4 rounded shadow-sm">
+                <p><strong>Status:</strong> {{ results.status }}</p>
+                <p><strong>Valor da Função Objetivo:</strong> {{ results.objective_value }}</p>
+
+                <h3 class="mt-4">Valores das Variáveis</h3>
+                <ul class="list-group">
+                    {% for var, value in results.variables.items %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>{{ var }}</span>
+                            <span class="badge bg-primary rounded-pill">{{ value }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="d-flex justify-content-between mt-4">
+                <a href="/linear" class="btn btn-primary">Novo Problema</a>
+                <button id="export-pdf" class="btn btn-success">Exportar PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+
+    <script>
+        document.getElementById('export-pdf').addEventListener('click', function () {
+            // Importando jsPDF
+            const {jsPDF} = window.jspdf;
+
+            // Criando uma instância do jsPDF
+            const doc = new jsPDF();
+
+            // Título do PDF
+            doc.setFontSize(16);
+            doc.text("Resultados do Problema", 10, 10);
+
+            // Captura os dados da página
+            const status = document.querySelector('p strong').nextSibling.textContent.trim();
+            const objectiveValue = document.querySelectorAll('p strong')[1].nextSibling.textContent.trim();
+
+            // Adiciona status e valor da função objetivo
+            doc.setFontSize(12);
+            doc.text(`Status: ${status}`, 10, 30);
+            doc.text(`Valor da Funcao Objetivo: ${objectiveValue}`, 10, 40);
+
+            // Captura os valores das variáveis
+            doc.text("Valores das Variaveis:", 10, 60);
+
+            const variables = document.querySelectorAll('.list-group-item');
+            let yOffset = 70;
+            variables.forEach((item) => {
+                const variable = item.querySelector('span:first-child').textContent.trim();
+                const value = item.querySelector('span:last-child').textContent.trim();
+                doc.text(`${variable}: ${value}`, 10, yOffset);
+                yOffset += 10;
+            });
+
+            // Baixa o PDF
+            doc.save("resultados.pdf");
+        });
+    </script>
+
+{% endblock %}

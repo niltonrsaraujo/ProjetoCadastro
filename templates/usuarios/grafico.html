@@ -1,0 +1,176 @@
+{% extends 'usuarios/base.html' %}
+
+{% block title %}Gráfico de Idades{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h1 class="text-center">Vários Gráficos com Chart.js</h1>
+
+        <!-- Início do Carrossel -->
+        <div id="graficosCarrossel" class="carousel slide" data-bs-ride="carousel">
+            <!-- Indicadores -->
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#graficosCarrossel" data-bs-slide-to="0" class="active"></button>
+                <button type="button" data-bs-target="#graficosCarrossel" data-bs-slide-to="1"></button>
+                <button type="button" data-bs-target="#graficosCarrossel" data-bs-slide-to="2"></button>
+                <button type="button" data-bs-target="#graficosCarrossel" data-bs-slide-to="3"></button>
+            </div>
+
+            <!-- Slides do Carrossel -->
+            <div class="carousel-inner">
+                <!-- Gráfico de Barras -->
+                <div class="carousel-item active">
+                    <div class="text-center">
+                        <h3>Gráfico de Barras</h3>
+                        <canvas id="graficoBarras"></canvas>
+                    </div>
+                </div>
+                <!-- Gráfico de Pizza -->
+                <div class="carousel-item">
+                    <div class="text-center">
+                        <h3>Gráfico de Pizza</h3>
+                        <canvas id="graficoPizza"></canvas>
+                    </div>
+                </div>
+                <!-- Gráfico de Radar -->
+                <div class="carousel-item">
+                    <div class="text-center">
+                        <h3>Gráfico de Radar</h3>
+                        <canvas id="graficoRadar"></canvas>
+                    </div>
+                </div>
+                <!-- Gráfico de Bolhas -->
+                <div class="carousel-item">
+                    <div class="text-center">
+                        <h3>Gráfico de Bolhas</h3>
+                        <canvas id="graficoBolha"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controles do Carrossel -->
+            <button class="carousel-control-prev" type="button" data-bs-target="#graficosCarrossel"
+                    data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Anterior</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#graficosCarrossel"
+                    data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Próximo</span>
+            </button>
+        </div>
+        <!-- Fim do Carrossel -->
+    </div>
+
+
+    <script>
+        const usuarios = {{ usuarios|safe }}; // Lista de dicionários [{nome: "João", idade: 25}, ...]
+
+        // Dados para os gráficos
+        const labels = usuarios.map(usuario => usuario.nome); // Nomes dos usuários
+        const idades = usuarios.map(usuario => usuario.idade); // Idades dos usuários
+        const mediaIdade = {{ media_idade|floatformat:2 }};
+
+        // Configuração de cores
+        const colors = [
+            'rgba(255, 99, 132, 0.5)',
+            'rgba(54, 162, 235, 0.5)',
+            'rgba(75, 192, 192, 0.5)',
+            'rgba(255, 206, 86, 0.5)',
+            'rgba(153, 102, 255, 0.5)',
+            'rgba(255, 159, 64, 0.5)',
+        ];
+
+        // 1. Gráfico de Barras
+        new Chart(document.getElementById('graficoBarras'), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Idades dos Usuários',
+                        data: idades,
+                        backgroundColor: colors,
+                        borderColor: colors.map(c => c.replace('0.5', '1')),
+                        borderWidth: 1,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                scales: {y: {beginAtZero: true}},
+            },
+        });
+
+        // 2. Gráfico de Pizza
+        new Chart(document.getElementById('graficoPizza'), {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        data: idades,
+                        backgroundColor: colors,
+                        hoverOffset: 4,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+            },
+        });
+
+        // 3. Gráfico de Radar
+        new Chart(document.getElementById('graficoRadar'), {
+            type: 'radar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Idades dos Usuários',
+                        data: idades,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1,
+                        pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    r: {beginAtZero: true},
+                },
+            },
+        });
+
+        // 4. Gráfico de Bolhas
+        const bolhaData = usuarios.map(usuario => ({
+            x: Math.random() * 100, // Valor aleatório no eixo X
+            y: usuario.idade, // Idade no eixo Y
+            r: Math.sqrt(usuario.idade) * 2, // Tamanho do ponto baseado na idade
+        }));
+
+        new Chart(document.getElementById('graficoBolha'), {
+            type: 'bubble',
+            data: {
+                datasets: [
+                    {
+                        label: 'Distribuição de Idades',
+                        data: bolhaData,
+                        backgroundColor: 'rgba(255, 206, 86, 0.5)',
+                        borderColor: 'rgba(255, 206, 86, 1)',
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {beginAtZero: true},
+                    y: {beginAtZero: true},
+                },
+            },
+        });
+    </script>
+{% endblock %}

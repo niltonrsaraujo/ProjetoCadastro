@@ -1,0 +1,21 @@
+{% extends 'usuarios/base.html' %}
+
+{% block title %}Configurar Problema{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-lg-6 offset-lg-3">
+            <h1 class="text-center mb-4">Configurar Problema</h1>
+            <form method="POST" class="bg-light p-4 rounded shadow-sm">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="/" class="btn btn-secondary">Voltar</a>
+                    <button type="submit" class="btn btn-primary">Continuar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}
